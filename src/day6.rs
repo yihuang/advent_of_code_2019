@@ -19,7 +19,7 @@ fn parse_input() -> (Vec<(Sym, Sym)>, StringInterner<Sym>) {
     )
 }
 
-pub fn main() {
+pub fn part1() {
     let mut orbits: HashMap<Sym, (Sym, usize)> = HashMap::new();
     let (pairs, _interner) = parse_input();
     for (a, b) in pairs {
@@ -44,8 +44,45 @@ pub fn main() {
         orbits.insert(b, path_b);
     }
 
-    println!(
-        "count: {}",
-        orbits.iter().map(|(_, (_, l))| l).sum::<usize>()
-    );
+    println!("{}", orbits.iter().map(|(_, (_, l))| l).sum::<usize>());
+}
+
+fn common_ansesters(map: &HashMap<Sym, Sym>, a: Sym, b: Sym) -> Option<(usize, usize)> {
+    let mut path: HashMap<Sym, usize> = HashMap::new();
+    {
+        let mut cursor = a;
+        let mut l = 0;
+        while let Some(x) = map.get(&cursor) {
+            path.insert(*x, l);
+            l += 1;
+            cursor = *x;
+        }
+    }
+    {
+        let mut cursor = b;
+        let mut l: usize = 0;
+        while let Some(x) = map.get(&cursor) {
+            if let Some(l2) = path.get(x) {
+                // crossed
+                return Some((l, *l2));
+            }
+            l += 1;
+            cursor = *x;
+        }
+    }
+    None
+}
+
+pub fn part2() {
+    let (pairs, mut interner) = parse_input();
+    let (len1, len2) = common_ansesters(
+        &pairs
+            .into_iter()
+            .map(|(a, b)| (b, a))
+            .collect::<HashMap<_, _>>(),
+        interner.get_or_intern("YOU"),
+        interner.get_or_intern("SAN"),
+    )
+    .unwrap();
+    println!("{}", len1 + len2);
 }
