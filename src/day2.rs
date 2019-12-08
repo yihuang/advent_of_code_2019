@@ -3,24 +3,21 @@ fn parse_input() -> Vec<u64> {
     input
         .trim_end()
         .split(',')
-        .map(|s| {
-            println!("{}", s);
-            s.parse().unwrap()
-        })
+        .map(|s| s.parse().unwrap())
         .collect()
 }
 
-fn interpreter(input: &mut [u64], mut pc: usize) -> Result<(), &'static str> {
+fn interpreter(prog: &[u64], mem: &mut [u64], mut pc: usize) -> Result<(), &'static str> {
     loop {
-        match input[pc] {
+        match prog[pc] {
             1 => {
-                input[input[pc + 3] as usize] =
-                    input[input[pc + 1] as usize] + input[input[pc + 2] as usize];
+                mem[prog[pc + 3] as usize] =
+                    mem[prog[pc + 1] as usize] + mem[prog[pc + 2] as usize];
                 pc += 4;
             }
             2 => {
-                input[input[pc + 3] as usize] =
-                    input[input[pc + 1] as usize] * input[input[pc + 2] as usize];
+                mem[prog[pc + 3] as usize] =
+                    mem[prog[pc + 1] as usize] * mem[prog[pc + 2] as usize];
                 pc += 4;
             }
             99 => {
@@ -33,10 +30,27 @@ fn interpreter(input: &mut [u64], mut pc: usize) -> Result<(), &'static str> {
     }
 }
 
+fn run(prog: &[u64], noun: u64, verb: u64) -> u64 {
+    let mut mem = prog.to_vec();
+    mem[1] = noun;
+    mem[2] = verb;
+    interpreter(prog, &mut mem, 0).unwrap();
+    mem[0]
+}
+
 pub fn part1() {
-    let mut input = parse_input();
-    input[1] = 12;
-    input[2] = 2;
-    interpreter(&mut input, 0).unwrap();
-    println!("{}", input[0]);
+    let prog = parse_input();
+    println!("{}", run(&prog, 12, 2));
+}
+
+pub fn part2() {
+    let prog = parse_input();
+    for i in 0..100 {
+        for j in 0..100 {
+            if run(&prog, i, j) == 19_690_720 {
+                println!("{}", i * 100 + j);
+                break;
+            }
+        }
+    }
 }

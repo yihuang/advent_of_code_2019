@@ -1,3 +1,5 @@
+use std::iter::successors;
+
 fn parse_input() -> Vec<u64> {
     let input: &str = include_str!("day1.input");
     input.lines().map(|line| line.parse().unwrap()).collect()
@@ -9,11 +11,8 @@ pub fn part1() {
 }
 
 fn fuel(n: u64) -> u64 {
-    (0..)
-        .scan(Some(n), |n, _| {
-            *n = ((*n)? / 3).checked_sub(2);
-            *n
-        })
+    successors(Some(n), |n| (n / 3).checked_sub(2))
+        .skip(1)
         .sum()
 }
 
