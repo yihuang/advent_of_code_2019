@@ -45,12 +45,15 @@ pub fn part1() {
 
 pub fn part2() {
     let prog = parse_input();
-    for i in 0..100 {
-        for j in 0..100 {
+    let result = iproduct!(0..100, 0..100)
+        .filter_map(|(i, j)| {
             if run(&prog, i, j) == 19_690_720 {
-                println!("{}", i * 100 + j);
-                break;
+                Some(i * 100 + j)
+            } else {
+                None
             }
-        }
-    }
+        })
+        .next()
+        .unwrap();
+    println!("{}", result);
 }
